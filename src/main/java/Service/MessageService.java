@@ -4,37 +4,45 @@ import java.util.List;
 
 import DAO.MessageDAO;
 import Model.Message;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MessageService {
 
     private MessageDAO messageDAO;
 
     public MessageService(){
-        messageDAO = new MessageDAO();;
+        messageDAO = new MessageDAO();
     }
 
     public MessageService(MessageDAO messageDAO){
         this.messageDAO = messageDAO;
     }
 
-    public List<Message> getAllMessagesByAccountId() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllMessagesByAccountId'");
+    public List<Message> getAllMessages() {
+        return messageDAO.getAllMessages();
+    }
+
+    public List<Message> getAllMessagesByAccountId(int account_id) {
+        List<Message> matchingMessages = messageDAO.getAllMessagesByAccountId(account_id);
+        return (matchingMessages != null) ? matchingMessages : null;
     }
 
     public Message createNewMessage(Message message) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'createNewMessage'");
+        return (message != null && !message.getMessage_text().trim().isEmpty() && message.getMessage_text().length() < 255) ? messageDAO.createNewMessage(message) : null;
     }
 
-    public Message updateMessageById(Message message) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateMessageById'");
+    public Message updateMessageById(int message_id, Message message) {
+        return (message != null && !message.getMessage_text().trim().isEmpty() && message.getMessage_text().length() < 255) ? messageDAO.updateMessageById(message_id, message) : null;
     }
 
-    public Message getMessageById() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getMessageById'");
+    public Message getMessageById(int message_id) {
+        return messageDAO.getMessageById(message_id);
     }
+
+    public Message deleteMessageById(int message_id) {
+        return messageDAO.deleteMessageById(message_id);
+    }
+
 
 }

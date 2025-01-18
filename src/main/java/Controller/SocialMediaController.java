@@ -1,11 +1,15 @@
 package Controller;
 
+import static org.mockito.ArgumentMatchers.anyList;
+
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
+import Model.Account;
 import Model.Message;
 import Service.AccountService;
 import Service.MessageService;
@@ -32,16 +36,14 @@ public class SocialMediaController {
      */
     public Javalin startAPI() {
         Javalin app = Javalin.create();
-        app.get("example-endpoint", this::exampleHandler);
         app.post("/messages/", this::createNewMessageHandler);
-        app.post("/messages/{message_id}", this::updateMessageByIdHandler);
+        app.patch("/messages/{message_id}", this::updateMessageByIdHandler);
         app.delete("/messages/{message_id}", this::deleteMessageByIdHandler);
         app.get("/messages/", this::getAllMessagesHandler);
         app.get("/messages/{message_id}", this::getMessageByIdHandler);
-        app.get("/accounts/{account_id}/", this::getAllMessagesByAccountIdHandler);
+        app.get("/accounts/{account_id}/messages", this::getAllMessagesByAccountIdHandler);
         return app;
     }
-
 
 
     /**
@@ -52,8 +54,9 @@ public class SocialMediaController {
         Message message = mapper.readValue(context.body(), Message.class);
         Message newMessage = messageService.createNewMessage(message);
         
-        if(newMessage!=null){
+        if(newMessage != null){
             context.json(mapper.writeValueAsString(newMessage));
+            context.status(200);
         }else{
             context.status(400);
         }
@@ -64,63 +67,85 @@ public class SocialMediaController {
      */
     private void updateMessageByIdHandler(Context context) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
+        JsonNode requestBody = mapper.readTree(context.body());
         Message message = mapper.readValue(context.body(), Message.class);
-        Message updatedMessage = messageService.updateMessageById(message);
+        int messageId = Integer.parseInt(context.pathParam("message_id")); // or posted_by
+        
+        Message updatedMessage = messageService.updateMessageById(messageId, message);
         
         if(updatedMessage!=null){
             context.json(mapper.writeValueAsString(updatedMessage));
+            //context.json(updatedMessage);
+            context.status(200);
         }else{
-            context.status(400);
+            context.status(200);
         }
     }
 
     /**
      * @param context The Javalin Context object manages information about both the HTTP request and response.
      */
-    private void deleteMessageByIdHandler(Context context) {
-            
+    private void deleteMessageByIdHandler(Context context) throws JsonProcessingException {
+        int messageId = Integer.parseInt(context.pathParam("message_id")); // or posted_by
+        Message message = messageService.deleteMessageById(messageId);
+
+        if(message!=null){
+            context.json(message);
+        }else{
+            context.status(200);
+        }
+        
+    }
+
+    /**
+     * @param context The Javalin Context object manages information about both the HTTP request and response.
+     * @throws JsonProcessingException 
+     * @throws JsonMappingException 
+     */
+    private void getAllMessagesByAccountIdHandler(Context context) throws JsonMappingException, JsonProcessingException {
+        int accountId = Integer.parseInt(context.pathParam("account_id")); // or posted_by
+
+        List<Message> accountMessages = messageService.getAllMessagesByAccountId(accountId);
+        
+        
+        if(accountMessages!=null){
+            context.json(accountMessages);
+        }else{
+            context.status(200); 
+        }
+        
     }
 
     /**
      * @param context The Javalin Context object manages information about both the HTTP request and response.
      */
-    private void getAllMessagesByAccountIdHandler(Context context) {
-        List<Message> accountMessages = messageService.getAllMessagesByAccountId();
-        context.json(accountMessages);
-    }
+    private void getAllMessagesHandler(Context context) throws JsonMappingException, JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
 
-    /**
-     * @param context The Javalin Context object manages information about both the HTTP request and response.
-     */
-    private void getAllMessagesHandler(Context context) {
-        List<Message> messages = messageService.getAllMessagesByAccountId();
+        List<Message> messages = messageService.getAllMessages();
         context.json(messages);
+        if(messages!=null){
+            context.json(mapper.writeValueAsString(messages));
+        }else{
+            context.status(200); 
+        }
+       
+        
     }
 
     /**
      * @param context The Javalin Context object manages information about both the HTTP request and response.
      */ 
-    private void getMessageByIdHandler(Context context){
-        Message message = messageService.getMessageById();
+    private void getMessageByIdHandler(Context context) {
+        int messageId = Integer.parseInt(context.pathParam("message_id")); // or posted_by
+        Message message = messageService.getMessageById(messageId);
+       
         if(message!=null){
             context.json(message);
         }else{
-            context.status(400);
+            context.status(200);
         }
     }
-
-
-
-
-    /**
-     * This is an example handler for an example endpoint.
-     * @param context The Javalin Context object manages information about both the HTTP request and response.
-     */
-    private void exampleHandler(Context context) {
-        context.json("sample text");
-    }
-
-
 
 
 }
