@@ -10,15 +10,15 @@ public class AccountService {
 
     private AccountDAO accountDAO;
 
-    /*
+    /**
      * 
-     * @Param
      */
     public AccountService(){
         accountDAO = new AccountDAO();
     }
 
-    /*
+    /**
+     * Parameterized constructor for AccountService
      * 
      * @Param AccountDAO accountDAO object
      */
@@ -26,9 +26,11 @@ public class AccountService {
         this.accountDAO = accountDAO;
     }
 
-    /*
+    /**
      * 
      * @Param Account account object
+     * @Return - result of method call to createAccount of accountDAO class
+     * @Return - null
      */
     public Account createAccount(Account account){
         Account foundAccount = accountDAO.getAccountByUsername(account.getUsername());
@@ -39,10 +41,12 @@ public class AccountService {
         return accountDAO.createAccount(account);
     }
 
-    /*
+    /**
      * 
      * @Param String username
      * @Param String password 
+     * @Return Account object
+     * @Return null 
      */
     public Account authenticateAccount(String username, String password){
         Account account = accountDAO.getAccountByUsername(username);
@@ -50,9 +54,11 @@ public class AccountService {
         return (account != null && account.getPassword().equals(password))? account : null;
     }
 
-    /*
+    /**
      * 
      * @Param int account ID number
+     * @Return Account object
+     * @Return null
      */
     public Account getAccountById(int account_id){
         Account account = accountDAO.getAccountById(account_id);

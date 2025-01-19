@@ -15,14 +15,11 @@ import Util.ConnectionUtil;
 public class MessageDAO {
     
     
-    /*    
-    * @param posted_by
-    * @param message_text
-    * @param time_posted_epoc
-    Whem retrieving a message from the database, all fields will be needed. In that case, a constructor with all
-    * fields is needed.
+    /**
+    *
     * @param message_id
-h
+    * @Return Message - the retrieved message object 
+    * @Return null
     */
     public Message getMessageById(int message_id){
         Connection connection = ConnectionUtil.getConnection();
@@ -44,9 +41,10 @@ h
     }
     
     
-    /*
+    /**
      * 
      * @Param int account ID number
+     * @Return List<Message> - all matching Message objects
      */
     public List<Message> getAllMessagesByAccountId(int account_id){
         List<Message> messages = new ArrayList<>();
@@ -72,9 +70,9 @@ h
     }
     
 
-    /*
+    /**
      * 
-     * @Param
+     * @Return List<Message> - all matching Message objects
      */
     public List<Message> getAllMessages(){
         List<Message> messages = new ArrayList<>();
@@ -95,9 +93,11 @@ h
         return messages;
     }
 
-    /*
+    /**
      * 
-     * @Param
+     * @Param Message object
+     * @Return Message - newly created message
+     * @Return null
      */
     public Message createNewMessage(Message message){
         Connection connection = ConnectionUtil.getConnection();
@@ -125,9 +125,12 @@ h
         return null;
     }
 
-    /*
+    /**
      * 
      * @Param int message ID number
+     * @Param Message object
+     * @Return Message - newly updated message
+     * @Return null
      */
     public Message updateMessageById(int messageId, Message updatedMessage){
         Connection connection = ConnectionUtil.getConnection();
@@ -149,9 +152,11 @@ h
         return null;
     }  
 
-    /*
+    /**
      * 
      * @Param int message ID number
+     * @Return Message - the deleted message
+     * @Return null
      */
     public Message deleteMessageById(int message_id){
         Connection connection = ConnectionUtil.getConnection();

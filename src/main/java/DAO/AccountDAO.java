@@ -12,9 +12,11 @@ import Util.ConnectionUtil;
 
 public class AccountDAO {
 
-    /*
+    /**
      * 
-     * @Param
+     * @param Account - account object 
+     * @Return Account - the newly created account object
+     * @Return null 
      */
     public Account createAccount(Account account){
         Connection connection = ConnectionUtil.getConnection();
@@ -38,9 +40,11 @@ public class AccountDAO {
         return null;
     }
 
-    /*
+    /**
      * 
      * @Param int account ID number
+     * @Return Account object mapped from query
+     * @Return null
      */
     public Account getAccountById(int account_id){
         Connection connection = ConnectionUtil.getConnection();
@@ -61,9 +65,11 @@ public class AccountDAO {
         return null;
     }
 
-    /*
+    /**
      * 
      * @Param String username
+     * @Return Account - the retrieved account object 
+     * @Return null
      */
     public Account getAccountByUsername(String username) {
         Connection connection = ConnectionUtil.getConnection();

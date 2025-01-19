@@ -48,9 +48,6 @@ public class SocialMediaController {
         return app;
     }
 
-
-    
-
     /**
      * @param context The Javalin Context object manages information about both the HTTP request and response.
      * @throws JsonProcessingException 
