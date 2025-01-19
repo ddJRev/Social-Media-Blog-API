@@ -15,14 +15,14 @@ import Util.ConnectionUtil;
 public class MessageDAO {
     
     
-    // FIXME: finish implementing the correct data / methods 
-    /*
+    /*    
+    * @param posted_by
+    * @param message_text
+    * @param time_posted_epoc
     Whem retrieving a message from the database, all fields will be needed. In that case, a constructor with all
     * fields is needed.
     * @param message_id
-    * @param posted_by
-    * @param message_text
-    * @param time_posted_epoch
+h
     */
     public Message getMessageById(int message_id){
         Connection connection = ConnectionUtil.getConnection();
@@ -44,6 +44,10 @@ public class MessageDAO {
     }
     
     
+    /*
+     * 
+     * @Param int account ID number
+     */
     public List<Message> getAllMessagesByAccountId(int account_id){
         List<Message> messages = new ArrayList<>();
         Connection connection = ConnectionUtil.getConnection();
@@ -68,6 +72,10 @@ public class MessageDAO {
     }
     
 
+    /*
+     * 
+     * @Param
+     */
     public List<Message> getAllMessages(){
         List<Message> messages = new ArrayList<>();
         Connection connection = ConnectionUtil.getConnection();
@@ -87,6 +95,10 @@ public class MessageDAO {
         return messages;
     }
 
+    /*
+     * 
+     * @Param
+     */
     public Message createNewMessage(Message message){
         Connection connection = ConnectionUtil.getConnection();
         try {
@@ -113,17 +125,18 @@ public class MessageDAO {
         return null;
     }
 
+    /*
+     * 
+     * @Param int message ID number
+     */
     public Message updateMessageById(int messageId, Message updatedMessage){
         Connection connection = ConnectionUtil.getConnection();
         try{
-            String sqlStatement = "UPDATE message SET posted_by = ?, message_text = ?, time_posted_epoch = ? WHERE message_id =  ?;";
+            String sqlStatement = "UPDATE message SET message_text = ? WHERE message_id =  ?;";
             PreparedStatement preparedStatement = connection.prepareStatement(sqlStatement);
 
-
-            preparedStatement.setInt(1, updatedMessage.getPosted_by());
-            preparedStatement.setString(2, updatedMessage.getMessage_text());
-            preparedStatement.setLong(3, updatedMessage.getTime_posted_epoch());
-            preparedStatement.setInt(4, messageId);
+            preparedStatement.setString(1, updatedMessage.getMessage_text());
+            preparedStatement.setInt(2, messageId);
             
             int rowsUpdated = preparedStatement.executeUpdate();
             if (rowsUpdated > 0){
@@ -136,6 +149,10 @@ public class MessageDAO {
         return null;
     }  
 
+    /*
+     * 
+     * @Param int message ID number
+     */
     public Message deleteMessageById(int message_id){
         Connection connection = ConnectionUtil.getConnection();
         try{

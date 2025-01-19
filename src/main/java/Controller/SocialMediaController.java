@@ -28,6 +28,7 @@ public class SocialMediaController {
 
     public SocialMediaController(){
         this.messageService = new MessageService();
+        this.accountService = new AccountService();
     }   
     /**
      * In order for the test cases to work, you will need to write the endpoints in the startAPI() method, as the test
@@ -42,12 +43,17 @@ public class SocialMediaController {
         app.get("/messages/", this::getAllMessagesHandler);
         app.get("/messages/{message_id}", this::getMessageByIdHandler);
         app.get("/accounts/{account_id}/messages", this::getAllMessagesByAccountIdHandler);
+        app.post("/login", this::accountLoginHandler);
+        app.post("/register", this::accountRegistrationHandler);
         return app;
     }
 
 
+    
+
     /**
      * @param context The Javalin Context object manages information about both the HTTP request and response.
+     * @throws JsonProcessingException 
      */
     private void createNewMessageHandler(Context context) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
@@ -64,26 +70,29 @@ public class SocialMediaController {
 
     /**
      * @param context The Javalin Context object manages information about both the HTTP request and response.
+     * @throws JsonProcessingException 
      */
     private void updateMessageByIdHandler(Context context) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode requestBody = mapper.readTree(context.body());
-        Message message = mapper.readValue(context.body(), Message.class);
-        int messageId = Integer.parseInt(context.pathParam("message_id")); // or posted_by
-        
-        Message updatedMessage = messageService.updateMessageById(messageId, message);
-        
+        int messageId = Integer.parseInt(context.pathParam("message_id")); 
+       
+        Message messageToUpdate = new Message();
+        messageToUpdate.setMessage_text(requestBody.get("message_text").asText());
+        Message updatedMessage = messageService.updateMessageById(messageId, messageToUpdate);
+
+
         if(updatedMessage!=null){
             context.json(mapper.writeValueAsString(updatedMessage));
             //context.json(updatedMessage);
-            context.status(200);
         }else{
-            context.status(200);
+            context.status(400);
         }
     }
 
     /**
      * @param context The Javalin Context object manages information about both the HTTP request and response.
+     * @throws JsonProcessingException 
      */
     private void deleteMessageByIdHandler(Context context) throws JsonProcessingException {
         int messageId = Integer.parseInt(context.pathParam("message_id")); // or posted_by
@@ -118,6 +127,8 @@ public class SocialMediaController {
 
     /**
      * @param context The Javalin Context object manages information about both the HTTP request and response.
+     * @throws JsonProcessingException 
+     * @throws JsonMappingException 
      */
     private void getAllMessagesHandler(Context context) throws JsonMappingException, JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
@@ -147,5 +158,50 @@ public class SocialMediaController {
         }
     }
 
+
+
+
+    /**
+     * @param context The Javalin Context object manages information about both the HTTP request and response.
+     * @throws JsonProcessingException 
+     */
+    private void accountLoginHandler(Context context) throws JsonProcessingException{
+        ObjectMapper mapper = new ObjectMapper();
+        Account attemptToLogin = mapper.readValue(context.body(), Account.class);
+
+        Account validLoginAccount = accountService.authenticateAccount(attemptToLogin.getUsername(), attemptToLogin.getPassword());
+
+        if (validLoginAccount != null){
+            context.json(mapper.writeValueAsString(validLoginAccount));
+            context.status(200);
+        } else {
+            context.status(401);
+        }
+
+    }
+
+    /**
+     * @param context The Javalin Context object manages information about both the HTTP request and response.
+     * @throws JsonProcessingException 
+     */
+    private void accountRegistrationHandler(Context context) throws JsonProcessingException{
+        ObjectMapper mapper = new ObjectMapper();
+        Account account = mapper.readValue(context.body(), Account.class);
+
+        if (account.getUsername() == null || account.getPassword() == null || account.getUsername().trim().isEmpty() || account.getPassword().length() < 4){
+            context.status(400);
+            return;
+        }
+
+        Account newAccount = accountService.createAccount(account);
+
+        if (newAccount != null){
+            context.json(mapper.writeValueAsString(newAccount));
+            context.status(200);
+        } else {
+            context.status(400);
+        }
+
+    }
 
 }
